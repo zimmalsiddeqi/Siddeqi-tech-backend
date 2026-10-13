@@ -81,6 +81,14 @@ fastify.addContentTypeParser('application/webhook+json', { parseAs: 'string' }, 
   done(null, body)
 })
 
+// ---- Normalize Duplicate Slashes (e.g. //api/courses -> /api/courses) ----
+fastify.addHook('onRequest', (req, reply, done) => {
+  if (req.raw.url && req.raw.url.startsWith('//')) {
+    req.raw.url = req.raw.url.replace(/^\/+/, '/')
+  }
+  done()
+})
+
 // ---- Register Plugins ----
 await fastify.register(formbody)
 await fastify.register(multipart, {
