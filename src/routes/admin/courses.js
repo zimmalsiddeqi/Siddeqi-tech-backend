@@ -15,6 +15,7 @@ import {
   deleteCourseSchema
 } from '../../schemas/courseSchemas.js'
 import { successResponse } from '../../utils/helpers.js'
+import { publicCache } from '../../utils/cache.js'
 
 export default async function adminCourseRoutes(fastify) {
 
@@ -37,6 +38,7 @@ export default async function adminCourseRoutes(fastify) {
     schema: createCourseSchema
   }, async (request, reply) => {
     const course = await createCourse(fastify.supabase, request.body, request.user.id)
+    publicCache.clear()
     return reply.status(201).send(successResponse(course))
   })
 
@@ -45,6 +47,7 @@ export default async function adminCourseRoutes(fastify) {
     schema: updateCourseSchema
   }, async (request, reply) => {
     const course = await updateCourse(fastify.supabase, request.params.id, request.body)
+    publicCache.clear()
     return reply.send(successResponse(course))
   })
 
@@ -53,6 +56,7 @@ export default async function adminCourseRoutes(fastify) {
     schema: deleteCourseSchema
   }, async (request, reply) => {
     const course = await archiveCourse(fastify.supabase, request.params.id)
+    publicCache.clear()
     return reply.send(successResponse(course))
   })
 }

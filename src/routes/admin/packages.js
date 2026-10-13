@@ -14,6 +14,7 @@ import {
   updatePackageSchema
 } from '../../schemas/packageSchemas.js'
 import { successResponse } from '../../utils/helpers.js'
+import { publicCache } from '../../utils/cache.js'
 
 export default async function adminPackageRoutes(fastify) {
 
@@ -35,6 +36,7 @@ export default async function adminPackageRoutes(fastify) {
     schema: createPackageSchema
   }, async (request, reply) => {
     const pkg = await createPackage(fastify.supabase, request.body)
+    publicCache.clear()
     return reply.status(201).send(successResponse(pkg))
   })
 
@@ -43,12 +45,14 @@ export default async function adminPackageRoutes(fastify) {
     schema: updatePackageSchema
   }, async (request, reply) => {
     const pkg = await updatePackage(fastify.supabase, request.params.id, request.body)
+    publicCache.clear()
     return reply.send(successResponse(pkg))
   })
 
   // DELETE /api/admin/packages/:id
   fastify.delete('/api/admin/packages/:id', async (request, reply) => {
     const pkg = await deletePackage(fastify.supabase, request.params.id)
+    publicCache.clear()
     return reply.send(successResponse(pkg))
   })
 }
